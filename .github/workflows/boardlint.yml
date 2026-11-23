@@ -1,0 +1,100 @@
+# Design review of the KiCad files with boardlint (https://github.com/mattvenn/boardlint):
+# bus wiring, pull-ups, I2C addresses, LED chains, supply ranges, decoupling, pin use, and two
+# small simulations (ngspice for the 3.3 V rail, Icarus Verilog for I2C and the LED chains).
+# It reads the files only: KiCad is not needed.
+#
+# The findings appear as annotations on the run and in its summary; the full report is an artifact.
+name: boardlint
+
+on:
+  push:
+    paths:
+      - '**.kicad_sch'
+      - '**.kicad_pcb'
+      - '**.kicad_pro'
+      - 'boardlint.yaml'
+      - '.github/workflows/boardlint.yml'
+  pull_request:
+    paths:
+      - '**.kicad_sch'
+      - '**.kicad_pcb'
+      - '**.kicad_pro'
+      - 'boardlint.yaml'
+      - '.github/workflows/boardlint.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # The checker is pinned to one commit, so the result for this board only changes when the
+  # board changes or this line does.
+  BOARDLINT_REF: 1a62c838fcf88892057c2851198fd356c890aa25
+  # 'false': report only, the job stays green.  'true': the job fails when boardlint reports an error.
+  # Accepted findings can be waived with a reason in boardlint.yaml (see the boardlint README).
+  BOARDLINT_STRICT: 'false'
+
+jobs:
+  review:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install the simulators
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends ngspice iverilog
+
+      - name: Install boardlint
+        run: python -m pip install -q "boardlint @ git+https://github.com/mattvenn/boardlint@${BOARDLINT_REF}"
+
+      - name: Run boardlint
+        id: lint
+        run: |
+          set +e
+          boardlint check . -f json -o boardlint.json
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+          boardlint check . -f md -o boardlint.md
+          exit 0
+
+      - name: Annotations and summary
+        if: always() && hashFiles('boardlint.json') != ''
+        run: |
+          python - <<'PY'
+          import json, os
+          r = json.load(open('boardlint.json'))
+          esc = lambda t: t.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+          for f in r['findings']:
+              if f['severity'] in ('error', 'warning'):
+                  print(f"::{f['severity']} title=boardlint {esc(f['check']).replace(',', ' ')}::{esc(f['title'])}")
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
+              out.write("The full report is also in the `boardlint-report` artifact of this run.\n\n")
+              out.write(open('boardlint.md').read())
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: boardlint-report
+          path: |
+            boardlint.md
+            boardlint.json
+          if-no-files-found: warn
+
+      - name: Result
+        run: |
+          code="${{ steps.lint.outputs.code }}"
+          if [ "$code" = "2" ]; then
+            echo "::error::A boardlint check crashed: the report is incomplete. See the summary."
+            exit 1
+          fi
+          if [ "$code" = "1" ] && [ "$BOARDLINT_STRICT" = "true" ]; then
+            echo "boardlint reported errors and BOARDLINT_STRICT is true."
+            exit 1
+          fi
+          echo "boardlint exit code $code (0 = clean, 1 = errors found); BOARDLINT_STRICT=$BOARDLINT_STRICT"

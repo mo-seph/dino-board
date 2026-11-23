@@ -17,6 +17,7 @@ decision and its reason, the parts list with stock checks, the review findings, 
 | `dinolight.kicad_sch`, `mcu.kicad_sch`, `leds.kicad_sch`, `sensors.kicad_sch` | The schematic, generated: do not edit by hand without reading the note below |
 | `dinolight.kicad_pcb` | The board, generated from the schematic's netlist and routed by `tools/route_all.sh` |
 | `tools/design_spec.py` | Every part and net, declared once. The source of truth |
+| `.github/workflows/boardlint.yml` | CI: a design review of the KiCad files with [boardlint](https://github.com/mattvenn/boardlint) on every change to them. Findings show on the run; it does not fail the build unless `BOARDLINT_STRICT` is set to `true` |
 | `tools/schematic.py` | Draws the schematic from the spec |
 | `tools/build_board.py` | Builds the board: outline, placement, nets |
 | `tools/route_all.sh` | Builds and routes the board start to finish (calls the tools below) |
