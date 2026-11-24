@@ -1,6 +1,6 @@
 # DinoLight
 
-A mosasaurus-shaped light-up circuit board: 20 side-firing addressable LEDs along the spine, a glowing
+A mosasaurus-shaped light-up circuit board: 18 side-firing addressable LEDs along the spine, a glowing
 eye, capacitive touch pads on the bare front face, motion, compass, temperature, light and pressure sensors,
 a buzzer, a rechargeable LiPo and USB-C.
 The brain is an ESP32-S3 module intended to run CircuitPython. Designed in KiCad 10 for assembly by JLCPCB.

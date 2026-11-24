@@ -7787,7 +7787,7 @@
 				)
 			)
 		)
-		(property "Value" "10uF"
+		(property "Value" "22uF"
 			(at 0 1.68 90)
 			(layer "F.Fab")
 			(uuid "516b83d7-f9f7-4342-af2e-7e43b77a688b")
@@ -12700,7 +12700,7 @@
 				)
 			)
 		)
-		(property "Value" "10uF"
+		(property "Value" "22uF"
 			(at 0 1.68 270)
 			(layer "F.Fab")
 			(uuid "11b1e805-3fb7-4bb4-b516-caa01075cb65")
@@ -18053,12 +18053,12 @@
 			)
 		)
 	)
-	(footprint "Package_TO_SOT_SMD:TSOT-23-5"
+	(footprint "Package_TO_SOT_SMD:SOT-23-5"
 		(layer "F.Cu")
 		(uuid "a6e9b96f-b2a1-492e-954e-d4f403a18a8a")
 		(at 81.745 52.245)
-		(descr "TSOT, 5 Pin (https://www.jedec.org/sites/default/files/docs/MO-193D.pdf variant AB)")
-		(tags "TSOT TO_SOT_SMD")
+		(descr "SOT, 5 Pin (JEDEC MO-178 Var AA https://www.jedec.org/document_search?search_api_views_fulltext=MO-178)")
+		(tags "SOT TO_SOT_SMD")
 		(property "Reference" "U3"
 			(at 0 -2.4 0)
 			(layer "F.SilkS")
@@ -18070,7 +18070,7 @@
 				)
 			)
 		)
-		(property "Value" "RT9080-33GJ5"
+		(property "Value" "XC6220B331MR-G"
 			(at 0 2.4 0)
 			(layer "F.Fab")
 			(uuid "89a46405-729a-459f-af93-837bd83683d6")
@@ -18424,7 +18424,7 @@
 			(uuid "d2da0143-e5f0-4d4d-93bc-319bc1339ce4")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Package_TO_SOT_SMD.3dshapes/TSOT-23-5.step"
+		(model "${KICAD10_3DMODEL_DIR}/Package_TO_SOT_SMD.3dshapes/SOT-23-5.step"
 			(offset
 				(xyz 0 0 0)
 			)

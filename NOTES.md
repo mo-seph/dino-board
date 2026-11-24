@@ -17,6 +17,10 @@ design work and are open to change.
 and a fresh route, an independent re-read with no blocker; the re-read's fixes are in but have not
 themselves been independently read. NOT FOR ORDERING: see NOT DONE below.
 
+- 2026-11-24, after the boardlint review the owner sent: regulator U3 is now an XC6220B331MR-G (lower
+  dropout, same pads), C3 and C5 are 22 uF. Parts and values only, no copper moved; rule check unchanged;
+  `fab/draft3` regenerated (U3's placement line changed with the part: check it in the preview). Not
+  independently read. See "boardlint review" under Reviews.
 - Architecture agreed by the owner (2026-11-22). Parts chosen and checked at JLCPCB; the sensors and buzzer
   were added on 2026-11-22 at the owner's request and checked the same way.
 - Schematic: `tools/design_spec.py` drawn by `tools/schematic.py`, 4 pages, 155 parts, 86 declared nets.
@@ -45,7 +49,7 @@ themselves been independently read. NOT FOR ORDERING: see NOT DONE below.
   and must not be ordered.
 - `fab/draft3/` (2026-11-23): upload set of the present four-layer board, made by `tools/make_upload.sh
   draft3`, FOR A QUOTE ONLY: Gerbers for four copper layers, mask, paste and silkscreen, drill files, BOM
-  (41 lines, 122 parts), placement file from JLCPCB's own footprints. `jlc_cpl.py` asks for a look in
+  (42 lines, 122 parts), placement file from JLCPCB's own footprints. `jlc_cpl.py` asks for a look in
   the preview at: D23 (polarised); J1, J2, J3, SW1, SW2, U4 (matched by position); and U9, where
   JLCPCB's footprint has a fifth, centre pad that the KiCad footprint (Sensirion's no-centre-pad pattern)
   leaves out, so its rotation could not be confirmed from the pads. The new eye LED D21 matched without
@@ -91,7 +95,8 @@ themselves been independently read. NOT FOR ORDERING: see NOT DONE below.
 | CHG_STAT and VBUS_DET dividers 100k over 200k (2/3) | Half of a sagging 4.4 V USB supply is 2.2 V, under the module's guaranteed high level of 2.475 V | mine, after review 1 |
 | C3, C4 at the regulator are 10 uF 0805 (were 1 uF 0402) | A 1 uF 0402 loses much of its value with 3 to 4 V across it; the regulator wants 1 uF effective | mine, after review 1 |
 | No USB power path: board runs from the battery, charger tops it up | Fewer parts; needs a battery fitted to run | mine, open |
-| RT9080-33 regulator | 2 uA quiescent, enable pin, 600 mA | mine, open |
+| XC6220B331MR-G regulator (was RT9080-33), 2026-11-24 | The owner, after the boardlint review: "see if we can find a lower dropout regulator". Same pins and pads. Pass transistor 0.2 ohm typ against about 0.5: at a 356 mA transmit peak it drops 113 mV at most where the RT9080 could drop 314 mV, so the module stays above 3.0 V down to a 3.36 V cell (was 3.56 V, above the 3.5 V at which firmware sleeps). Costs: 8 uA quiescent in place of 2 (sleep total about 80 to 86 uA), $0.48 in place of $0.12, enable threshold 1.2 V in place of 0.9 V (USB alone gives 1.9 to 2.4 V) | owner asked, mine chosen |
+| C3 (regulator input) and C5 (at the module) are 22 uF 0805, were 10 uF | C3: the XC6220's table wants 10 uF of real input capacitance for a 4.7 uF output capacitor (with 4.7 uF in, 47 uF out), and a 10 uF 0805 gives less than 10 with 4 V across it. C5: the 22 uF the module datasheet shows. Same pads, basic part | mine |
 | MCP73831 charger at 213 mA (4.7k) | Gentle on a 500 mAh cell | mine, open |
 | Charger STAT through a 100k / 100k divider | STAT is three-state and drives to VBUS (5 V) when charge completes; the module's pins are 3.3 V | mine |
 | Polarity jumpers SJ1, SJ2 on the battery connector | JST-PH LiPos come in both polarities and the cell is bought separately, unseen. Default: J2 pin 1 = + (SparkFun's stated convention; whether that is the footprint's pad 1 is unverified) | mine, open |
@@ -135,7 +140,8 @@ The owner's upload on 2026-11-22 matched every line by C-number.
 | 100R 0805 x2, 2.2k 0402 x2, 1 uF 0402, 4.7 uF 0603 | C17408, C25879, C52923, C19666 | millions | Economic and Standard | basic | | | |
 | TYPE-C-31-M-12 USB-C, 16 pin | C165948 | 482,527 | Economic and Standard | ext | $0.19 | USB_C_Receptacle_HRO_TYPE-C-31-M-12 (0.12 mm) | board-edge line |
 | MCP73831T-2ACI/OT charger | C424093 | 4,058 | Economic and Standard | ext | $0.79 | SOT-23-5 | |
-| RT9080-33GJ5 regulator | C841192 | 25,016 | Economic and Standard | ext | $0.12 | TSOT-23-5 | |
+| XC6220B331MR-G regulator | C86534 | 7,846 (2026-11-23) | Economic and Standard | ext | $0.48 | SOT-23-5 (KiCad's pads are the same as its TSOT-23-5; JLCPCB's pads for this part lie inside them) | start-up and wake from sleep on the real board |
+| 22 uF 0805 25 V X5R (C3, C5) | C45783 | 4,724,905 (2026-11-23) | Economic and Standard | basic | $0.11 | 0805 | |
 | AO3401A P-FET x2 | C15127 | 1,198,551 | Economic and Standard | basic | $0.08 | SOT-23 (0.28 mm) | pinout G1 S2 D3 from the KiCad symbol, not yet from the datasheet |
 | 2N7002 N-FET | C8545 | 6,087,828 | Economic and Standard | basic | $0.02 | SOT-23 | same |
 | MSK12C02 slide switch | C431540 | 178,549 | Economic and Standard | ext | $0.05 | SW_SPDT_Shouhan_MSK12C02 (0.20 mm) | |
@@ -235,9 +241,14 @@ corner with no terminal is chamfered. Sound port on top.
 **AO3400A (C20917).** AOS datasheet: threshold 0.65 to 1.45 V, under 48 milliohms at 2.5 V gate drive,
 gate limit +/-12 V. SOT-23, 1 gate, 2 source, 3 drain (KiCad symbol; the datasheet drawing agrees).
 
-**RT9080-33GJ5 (C841192).** TSOT-23-5: 1 VIN, 2 GND, 3 EN, 4 NC, 5 VOUT. VIN 1.2 to 5.5 V. EN high
-above 0.9 V, low below 0.4 V, absolute max 6.5 V. Shutdown 0.1 uA typ. Drawn with KiCad's XC6220B331MR
-symbol, which has the same pin numbers.
+**XC6220B331MR-G (C86534), from `datasheets/C86534_XC6220.pdf`.** SOT-25: 1 VIN, 2 VSS, 3 CE, 4 NC,
+5 VOUT. VIN 1.6 to 6.0 V (absolute max 6.5 V). 1 A. Dropout at 3.0 to 3.5 V out: 60 mV typ, 95 mV max at
+300 mA. CE on from 1.2 V, off below 0.4 V; the B type has no pull-down on CE (R5 is ours) and discharges
+the output through about 460 ohms when off. Supply current 8 uA typ (18 max) below about 1 mA of load,
+50 uA typ (108 max) above 5 to 10 mA: it changes mode by itself. Stand-by 0.01 uA typ, 0.1 max. Output
+capacitor for 3.0 to 3.5 V out: 4.7 uF with 10 or 22 uF at the input, 47 uF with 4.7 uF at the input.
+Inrush limited to 700 mA; fold-back limit, about 180 mA into a short. Replaced the RT9080-33GJ5 (C841192:
+dropout 0.31 V typ, 0.53 V max at 600 mA; `datasheets/C841192.pdf`) on 2026-11-24.
 
 **MCP73831T-2ACI/OT (C424093).** SOT-23-5: 1 STAT, 2 VSS, 3 VBAT, 4 VDD, 5 PROG. 4.7 uF minimum on VDD.
 Charge current 1000 V / RPROG. STAT is a three-state output (datasheet section 3).
@@ -419,6 +430,31 @@ the IPC-2221 formula, MPR121 behaviour.
 The board was re-routed from scratch after these fixes (placement changed), so the result needs its own
 rule check, audit and a re-read of what changed: see State.
 
+### boardlint review, sent by the owner 2026-11-24
+
+An automated design check (github.com/mattvenn/boardlint) with its findings triaged by an AI model, run
+on commits 4da182c and eb2fd13: the schematic of the present design, but the two-layer routing of the day
+before. Its layout findings are therefore checked here against the present four-layer board. It reproduced
+every pin assignment and I2C address from the design files.
+
+| # | Finding | On the present board | Decision |
+|---|---|---|---|
+| 1 | 3.3 V at the module falls below 3.0 V at a 356 mA transmit peak unless the cell is well charged (3.06 V from a 3.6 V cell; its figures: 0.45 ohm from cell to regulator, RT9080 at its maximum dropout, 185 milliohm of track) | True. The feed is 243 milliohm today | Regulator changed to the XC6220B331 and C5 to 22 uF (see Decisions). With the review's own source resistance and both parts at their datasheet maximum, the module gets 3.21 V from a 3.6 V cell (was 3.04 V) and stays above 3.0 V down to a 3.36 V cell (was 3.56 V). Not changed: the regulator's position and the feed's width |
+| 2 | Fuse F1 holds 1.1 A; full white while transmitting could draw 1.27 A (21 LEDs) | 19 LEDs now: 0.83 A + 0.36 A = 1.18 A | Firmware limit on LED current, already required (see For firmware) |
+| 3 | 0.4 mm battery-path tracks for up to 1.27 A | Re-routed: +BATT from Q1 to the regulator computes to 17 milliohm. The LED feed still has 0.4 mm pieces on the 0.5 oz inner layer (see Routing) | Same firmware limit; 1 oz inner copper on the order form is the owner's choice |
+| 4 | Nearest 100 nF 8 to 11 mm from U5, U6, U7 | Gone: capacitors are placed with their chips; `board_audit.py` finds no such case (its two decoupling findings are U1's VBUS pin and the battery-sense pin) | None needed |
+| 5 | USB D+ / D- beside touch lines for 25 to 33 mm, down to 0.6 mm | Re-routed: closest 0.72 mm edge to edge; 4 mm of run within 1 mm and 12 mm within 2 mm, all beside the front-flipper line | Left. Matters only while USB is active |
+| 6 | SK6812 specified from 3.7 V; the rail goes to 3.0 V | Known | Firmware sleeps at about 3.5 V; dim or off-colour LEDs below 3.7 V accepted |
+| 7 | Spine LED data line had no ground under half its length | In1 is now a ground plane | None needed |
+| 8 | Buzzer gets about 0.63 V at DC (50 ohms in series with its 12 ohm coil); it is specified from 2 V | True; loudness was already an estimate | Left as designed, for the owner: R35 and R37 could be a lower value on the same pads (two 47 ohm: about 1.1 V, 96 mA if the pin sticks high, at the edge of the parts' ratings). Louder only by measurement |
+| 9 | Its description of the board named the module ESP32-S2-MINI-1 | The part is ESP32-S3-MINI-1-N8; the KiCad footprint is named ESP32-S2-MINI-1 (same pads, checked against JLCPCB's) | None needed |
+
+The regulator change is a part and value change on unchanged pads: schematic regenerated (86 nets, no
+differences), board values updated in place, rule check with parity unchanged (0 unconnected, no value or
+footprint mismatch). Not verified: the XC6220's behaviour at start-up into this board's capacitance, on wake
+from sleep (it is in its low-current mode while the module sleeps), and with the cell at the end of 150 mm
+of lead; none of this has had an independent read.
+
 ### Re-read of the re-routed board and the draft3 upload set, 2026-11-23 (fresh independent reader)
 
 Read the board as pushed in commit e8cc24e (third four-layer route) and `fab/draft3` as first made. Verdict:
@@ -487,7 +523,9 @@ Known weaknesses:
 - The spine electrodes (show face, 5.5 to 11.5 mm from the edge) sit behind the LED supply rail and the
   touch lanes on the parts side. Each adds stray capacitance to that channel. Not measured.
 - The regulator is about 100 mm from the module; the 3.3 V feed between them measured 204 milliohm through
-  12 vias on the first four-layer route (layout review). Not a plane: In2 carries signals and ground fill.
+  12 vias on the first four-layer route (layout review) and computes to 243 milliohm on the present one
+  (network solve over the track pieces, 0.5 oz inner copper; 77 mm of it is on In2, so 1 oz inner copper
+  would take roughly 50 to 70 milliohm off). Not a plane: In2 carries signals and ground fill.
 - Both mounting holes are placeholders until the case exists.
 - The temperature sensor is on the part of the tail that sticks out of the case: a bare 1.5 x 1.5 mm part
   and its capacitor on the back of the tail tip, within reach of fingers. By the owner's choice.

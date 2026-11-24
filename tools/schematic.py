@@ -166,9 +166,9 @@ P.part('TP14', 75, 166, ref=(1.5, -2.6, 'l'), val=None)
 P.hint('SW1: 2-1 joined = on; 2-3 = off (3 is open)', 16, 178)
 P.note(14, 196, 'SW1 on: LDO_EN = battery, regulator runs. SW1 carries no load current.',
        'USB plugged in: D23, R4 / R5 put about 2.2 V on LDO_EN whatever SW1 says, so it can',
-       'show charging and be programmed. Otherwise off: U3 shut down (0.1 uA typ),',
+       'show charging and be programmed. Otherwise off: U3 shut down (0.01 uA typ),',
        'LED rail off. D23 stops the battery feeding back onto VBUS through R4.',
-       'U3 is an RT9080-33 (drawn with a pin-compatible symbol), 2 uA quiescent.')
+       'U3 is an XC6220B331: 0.2 ohm pass transistor (60 mV dropout at 300 mA), 8 uA quiescent.')
 
 # ---- monitoring ------------------------------------------------------------------------
 P.frame(154, 110, 232, 215, 'Battery voltage and USB detect')

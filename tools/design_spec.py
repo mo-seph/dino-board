@@ -138,7 +138,8 @@ R0402, C0402, C0805 = 'Resistor_SMD:R_0402_1005Metric', 'Capacitor_SMD:C_0402_10
 SOT23 = 'Package_TO_SOT_SMD:SOT-23'
 RES = {'2.2k': 'C25879', '1k': 'C11702', '330R': 'C25104', '470R': 'C25117', '4.7k': 'C25900', '5.1k': 'C25905', '10k': 'C25744', '100k': 'C25741',
        '200k': 'C25764', '1M': 'C26083'}
-CAP = {'100nF': (C0402, 'C1525'), '10uF': (C0805, 'C15850'), '1uF': (C0402, 'C52923'), '4.7uF': (C0603, 'C19666')}
+CAP = {'100nF': (C0402, 'C1525'), '10uF': (C0805, 'C15850'), '1uF': (C0402, 'C52923'), '4.7uF': (C0603, 'C19666'),
+       '22uF': (C0805, 'C45783')}
 
 
 def declare(d):
@@ -164,7 +165,7 @@ def declare(d):
     # ICs
     d.comp('U1', 'Power_Protection:USBLC6-2SC6', 'USBLC6-2SC6', 'Package_TO_SOT_SMD:SOT-23-6', lcsc='C7519')
     d.comp('U2', 'Battery_Management:MCP73831-2-OT', 'MCP73831T-2ACI/OT', 'Package_TO_SOT_SMD:SOT-23-5', lcsc='C424093')
-    d.comp('U3', 'Regulator_Linear:XC6220B331MR', 'RT9080-33GJ5', 'Package_TO_SOT_SMD:TSOT-23-5', lcsc='C841192')
+    d.comp('U3', 'Regulator_Linear:XC6220B331MR', 'XC6220B331MR-G', 'Package_TO_SOT_SMD:SOT-23-5', lcsc='C86534')
     d.comp('U4', 'RF_Module:ESP32-S3-MINI-1', 'ESP32-S3-MINI-1-N8', 'RF_Module:ESP32-S2-MINI-1', lcsc='C2913206')
     # touch controller: 12 channels on I2C (0x5C), interrupt can wake the module
     d.comp('U7', 'Sensor_Touch:MPR121QR2', 'MPR121QR2', 'Package_DFN_QFN:UQFN-20_3x3mm_P0.4mm', lcsc='C91322')
@@ -214,7 +215,10 @@ def declare(d):
     r('R32', '1k')
     r('R14 R15', '330R')
     r(' '.join('R%d' % (20 + i) for i in range(len(TOUCH))), '470R')
-    c('C1 C2 C3 C4 C5 C8 C9', '10uF')
+    c('C1 C2 C4 C8 C9', '10uF')
+    # C3: the XC6220 wants 10 uF of real input capacitance (its table: with 4.7 uF in, 47 uF out).
+    # C5: the module datasheet's 22 uF, at the module's supply pin.
+    c('C3 C5', '22uF')
     c('C42', '1uF')
     c('C40', '4.7uF')
     c('C6 C7 C10 C32 C33 C34 C36 C37 C38 C39 C41 C43 C44 ' + ' '.join('C%d' % (10 + i) for i in range(1, N_LED + 1)) + ' C31', '100nF')
