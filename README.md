@@ -23,6 +23,8 @@ decision and its reason, the parts list with stock checks, the review findings, 
 | `tools/route_all.sh` | Builds and routes the board start to finish (calls the tools below) |
 | `tools/route_board.py` | Scripted tracks (LED strip, touch lines), autorouter hand-over, ground pours |
 | `tools/patch_route.py`, `tools/trim_dangling.py` | Finish what the autorouter leaves open; tie in ground; tidy |
+| `tools/silkscreen.py` | Draws the show face's silkscreen: the mosasaurus, touch pad outlines, LED numbers, the name |
+| `tools/title_outline.py`, `art/lettering.json` | The lettering as plain outlines, made once from a font file |
 | `tools/freerouting_capped.sh` | Runs the Freerouting autorouter for a set number of passes |
 | `routing/route_signals.ses` | The autorouter's last result, kept because it differs run to run |
 | `outline/` | The outline generator and its SVG / PNG |

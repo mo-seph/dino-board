@@ -1,7 +1,7 @@
 #!/bin/bash
 # Export the JLCPCB upload set from dinolight.kicad_pcb into fab/<name>/:
 #   <name>_gerbers.zip, bom_jlcpcb.csv, cpl_jlcpcb.csv
-# Usage: tools/make_upload.sh <name>       e.g. tools/make_upload.sh draft3      (four copper layers)
+# Usage: tools/make_upload.sh <name>       e.g. tools/make_upload.sh v0.1        (four copper layers)
 # The placement file comes from JLCPCB's own footprints (jlc_cpl.py from the pcb-for-assembly skill).
 set -e
 cd "$(dirname "$0")/.."

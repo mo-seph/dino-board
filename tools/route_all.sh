@@ -45,6 +45,7 @@ fi
 "$KPY" tools/trim_dangling.py 2>&1 | quiet                      # KiCad's own list of dead ends, safely
 cp dinolight.kicad_pcb $W/before_pour.kicad_pcb
 "$KPY" tools/route_board.py pour 2>&1 | quiet                   # ground plane, pours on the other layers, stitching vias
+"$KPY" tools/silkscreen.py 2>&1 | quiet                         # the show face's drawing, pad outlines, LED numbers and name
 "$K" pcb drc --format json --severity-all --schematic-parity -o $W/drc.json dinolight.kicad_pcb > /dev/null
 python3 tools/drc_summary.py $W/drc.json
 rm -f ./~*.lck

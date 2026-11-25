@@ -467,8 +467,8 @@ def main():
     board.Add(r)
     bcx, bcy = (x0 + x1) / 2, (y0 + y1) / 2
     for text, (x, y), layer, mirrored in [('BATTERY: keep clear', (bcx, bcy - 3), pcbnew.F_SilkS, False),
-                                          ('DinoLight v0.1 DRAFT 2026-11-22', (bcx, bcy + 4), pcbnew.F_SilkS, False),
-                                          ('DinoLight v0.1 DRAFT', (bcx, bcy + 6), pcbnew.B_SilkS, True)]:
+                                          ('DinoLight v0.1 DRAFT 2026-11-22', (bcx, bcy + 4), pcbnew.F_SilkS, False)]:
+        # the show face's silkscreen is drawn by tools/silkscreen.py, after routing
         t = pcbnew.PCB_TEXT(board)
         t.SetText(text)
         t.SetPosition(vec(*B(x, y)))

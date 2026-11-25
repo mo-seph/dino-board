@@ -13,13 +13,22 @@ design work and are open to change.
 
 ## State
 
-2026-11-23: ROUTED ON FOUR LAYERS. The layout has had an independent review and, after the owner's changes
-and a fresh route, an independent re-read with no blocker; the re-read's fixes are in but have not
-themselves been independently read. NOT FOR ORDERING: see NOT DONE below.
+2026-11-25: ORDERED. The owner reports the board sent out for fabrication (told 2026-11-25), from
+`fab/v0.1` as rebuilt after the release review (Gerber zip md5 15493355...). Quantity, price, board options
+and what JLCPCB's placement preview showed are not recorded here yet. See "When the boards arrive".
+
+2026-11-24: PACKAGED FOR ORDERING AT THE OWNER'S WORD ("repackage and I'll get it made"): `fab/v0.1/`.
+Routed on four layers. The layout has had an independent review and, after the owner's changes and a fresh
+route, an independent re-read with no blocker. Changed since that re-read and not yet independently read:
+its own three fixes, the regulator and two capacitors, and the show-face silkscreen: all read by the
+independent release review of 2026-11-24, with `fab/v0.1` itself (see Reviews): no blocker, two should-fix,
+both acted on. After that review, and read by nobody else: a dead stub of ACC_INT1 removed (13 pieces, one
+via; pours refilled) and the cell-polarity marks added to the parts side; `fab/v0.1` was rebuilt after
+them and checked by script against the board. Still open at the time of packaging: see NOT DONE below.
 
 - 2026-11-24, after the boardlint review the owner sent: regulator U3 is now an XC6220B331MR-G (lower
   dropout, same pads), C3 and C5 are 22 uF. Parts and values only, no copper moved; rule check unchanged;
-  `fab/draft3` regenerated (U3's placement line changed with the part: check it in the preview). Not
+  the upload set regenerated (U3's placement line changed with the part: check it in the preview). Not
   independently read. See "boardlint review" under Reviews.
 - Architecture agreed by the owner (2026-11-22). Parts chosen and checked at JLCPCB; the sensors and buzzer
   were added on 2026-11-22 at the owner's request and checked the same way.
@@ -47,20 +56,23 @@ themselves been independently read. NOT FOR ORDERING: see NOT DONE below.
   The eye LED was flagged twice: advanced part, and baking. The current board (4 layers, five more
   extended lines) has NOT been quoted and will cost more. `draft/` and `fab/draft2/` are old quote-only sets
   and must not be ordered.
-- `fab/draft3/` (2026-11-23): upload set of the present four-layer board, made by `tools/make_upload.sh
-  draft3`, FOR A QUOTE ONLY: Gerbers for four copper layers, mask, paste and silkscreen, drill files, BOM
+- `fab/v0.1/` (2026-11-24): THE UPLOAD SET, made by `tools/make_upload.sh v0.1` after the last change to
+  the board (it replaces `fab/draft3`, which was for a quote): Gerbers for four copper layers, mask, paste and silkscreen, drill files, BOM
   (42 lines, 122 parts), placement file from JLCPCB's own footprints. `jlc_cpl.py` asks for a look in
   the preview at: D23 (polarised); J1, J2, J3, SW1, SW2, U4 (matched by position); and U9, where
   JLCPCB's footprint has a fifth, centre pad that the KiCad footprint (Sensirion's no-centre-pad pattern)
   leaves out, so its rotation could not be confirmed from the pads. The new eye LED D21 matched without
-  comment. Regenerated after the re-read's fixes, with U9 placed at its footprint origin. The re-read
-  checked the first version of this set (layers, drill, BOM, every rotation); the regenerated files have
-  not been read again.
+  comment. U9 is placed at its footprint origin. Checked by script on 2026-11-24: every
+  file in the zip is the same as a fresh export of the board (dates aside); 42 BOM lines, 122 parts, each
+  netlist part with a part number in the BOM once with that number; 122 placement lines, the same
+  designators. The re-read of 2026-11-23 checked the first version of this set (layers, drill, BOM, every
+  rotation); U3's rotation has changed since (new part: 0, was 270).
 - Git: branch `main`, remote `origin`.
 - Tools: kicad-cli 10.0.8 runs with `KICAD_DOCUMENTS_HOME=<project>/kicad-user`.
 - NOT DONE: the owner's read of the schematic; mechanical sign-off of the placement and the mounting-hole
-  positions (placeholders); a read of the fixes made after the re-read; silkscreen and show-face
-  artwork; JLCPCB's edge rails and tab positions; the release review; JLCPCB's placement preview.
+  positions (placeholders); a read of the fixes made after the re-read; the owner's view of the show-face
+  artwork (first version drawn 2026-11-24, see Decisions) and the parts-side silkscreen, which still says
+  DRAFT; JLCPCB's edge rails and tab positions; the release review; JLCPCB's placement preview.
 
 ## Deadline
 
@@ -76,6 +88,7 @@ themselves been independently read. NOT FOR ORDERING: see NOT DONE below.
 |---|---|---|
 | Mosasaurus, head left on the show face, about 212 x 74 mm | The recipient's favourite; no thin legs, so robust | owner |
 | Bare PCB front is the show face: artwork and touch pads, no cover | "Clearly a made thing" | owner |
+| Show-face silkscreen, 2026-11-24: a line drawing of the mosasaurus (eye, brow, teeth, belly line, the backbone turning down into the lower tail lobe, tail bands and rays), an outline round every touch pad, a number by each spine LED from 1 at the head (D1, the first LED firmware addresses), and "Mosasauraboard" 9.3 mm high. Printed reversed: white ink over 84 % of the face, the drawing left as bare solder mask, a 0.5 mm bare rim at the edge | The owner asked for exactly this, and for it reversed "if that is allowed". It is: JLCPCB's capabilities page lists hollow-carved lettering and puts no limit on printed area (see Check before ordering). Made by `tools/silkscreen.py`, which reads the touch copper and mask openings from the board; `tools/silkscreen.py lines` gives the ordinary white-on-green version. Nothing printed is under 0.2 mm wide and nothing bare under 0.25 mm. Lettering: Arial Rounded Bold, as outlines in `art/lettering.json` | owner; drawing mine, for the owner to look at |
 | CircuitPython | Easy to change later: edit `code.py` on the USB drive | owner |
 | Battery bought locally at the destination, not shipped with the toy | Lithium cells are restricted in the post | owner |
 | ESP32-S3-MINI-1-N8 module | Native USB (no bridge chip), deep sleep, Bluetooth, in stock. Cheaper modules checked 2026-11-22: ESP32-S2-MINI-2 ($2.89) loses Bluetooth and the two LED data pins; ESP32-C3-MINI-1 ($3.05) is no better. Saving about $9 on five boards: not worth it | mine, open |
@@ -262,6 +275,9 @@ frame. Signal pins are on the side away from the knob. Rated 50 mA at 12 V.
 |---|---|
 | Four layers: price and build time | Not priced. The owner's EUR 143 quote was for a 2-layer draft. On the order form choose 4 layers, 1.6 mm; the upload quote shows the price and the build time, which matters against the deadline |
 | Four layers: JLCPCB's limits | Read from jlcpcb.com/capabilities/pcb-capabilities on 2026-11-23: multilayer track and gap 0.09 mm minimum (board uses 0.15); via hole 0.3 mm in a 0.5 mm pad carries no surcharge (surcharge is for 0.25 mm holes and under, or pads under 0.45 mm); via hole to inner-layer copper 0.2 mm minimum (board: 0.25 or more); via hole to hole 0.2 mm (board: 0.25); inner copper 0.5 oz by default. The stack-up choice on the order form was not looked at: the board needs no controlled impedance |
+| Show-face silkscreen | JLCPCB's silkscreen limits, read from its capabilities page ("Legend") on 2026-11-24: line 0.15 mm or wider, text 1.0 mm or taller, stroke to height 1:6 preferred, the same for "hollow-carved" characters, 0.15 mm from a pad. Look at the back in JLCPCB's Gerber viewer: white with the drawing in green. Not verified: how evenly a flood this large prints, and how the 444 tented via holes look under it (expect small dimples) |
+| Order form, from the release review | Via covering: tented, as the Gerbers are. If JLCPCB queries the USB socket's two short slots (1.2 mm long, 0.6 mm wide), they are as the connector's drawing asks |
+| Order number on the board | JLCPCB prints its order number somewhere in the silkscreen unless the order form says otherwise. On the form choose to leave the mark off, or to place it (then a marker text goes on the parts side). From memory, not read from the form |
 | New parts in the placement preview | Pin 1 and rotation of U5, U8, U9, U10, U11; the buzzer's + pad (BZ1); D24's cathode; Q4 |
 | QMC5883P stock | 2,731 on 2026-11-22 but the page showed 0 available to pre-order: look again on the day |
 | No-wash parts | SHT40, BMP580 and the buzzer have openings: confirm JLCPCB's process does not wash or coat the board |
@@ -489,6 +505,34 @@ The placement preview remains the last check, especially the side LEDs, D21, U9 
 The fixes above changed the routing round the head, the tail stem and the battery corner after the re-read.
 Those changes have been rule-checked and audited, not independently read.
 
+### Release review, 2026-11-24: `fab/v0.1` and everything changed since the re-read (fresh independent reader)
+
+Read the upload set as first packaged (zip md5 da43ef1e...) and the board changes since commit e8cc24e.
+Verdict: no blocker.
+
+| # | Level | Finding | Decision |
+|---|---|---|---|
+| S1 | SHOULD | ACC_INT1 (motion interrupt 1, 0.15 mm, parts side) was re-laid by the touch-spacing fix as a 21 mm loop: 13.4 mm of it lies behind the rear-flipper electrode E11 with no plane between, it passes E11's anchor pad at 0.22 mm, and the old route was left as a 4.6 mm dead stub with a via and a show-face piece 0.5 mm from the rear-flipper touch line | Stub removed (13 track pieces and the via at board (92.38, 70.10); pours refilled; rule check and audit otherwise unchanged). The loop is left: the direct way from U5 pin 4 is closed by the rear-flipper line's own via at (89.0, 69.76), 0.3 mm below the chip's pad row, and moving a touch via now is the greater risk. My estimate of the coupling: 0.1 to 0.2 pF. Firmware keeps INT1 still while touch is in use (see For firmware) |
+| S2 | SHOULD | Parts-side silkscreen unfinished: the text still says DRAFT; no + / - at J2 and no instruction at SJ1 / SJ2, which "Check before ordering" relies on; no labels on the test points | + and - added inside the battery rectangle at the connector's mouth, in line with its two pins (pad 1 is +), and four lines of instruction in the rectangle (`tools/silkscreen.py`, FRONT). The DRAFT text stays: the owner, 2026-11-24, "definitely leave the info on the parts side". Test points are not labelled on the board: TP1 to TP17 are, in order, the nets in `TESTPOINTS` in `tools/design_spec.py` |
+| N1 | NOTE | Supply paths by the reader's own network solve: battery connector to Q1 45 milliohm; Q1 to the regulator 16; Q1 to the LED switch 179 (was 225), of which 112 is 45 mm of 0.4 mm track on In2; LED switch to the far LED 206; regulator to the module 232 (the notes' 243 confirmed); the 0.25 mm neck on VLED is still there | Known. Firmware LED limit; 1 oz inner copper is the owner's choice on the order form |
+| N2 | NOTE | XC6220B331 checked against its datasheet pin by pin: pins, enable levels in all three states (switch on, USB only, off), input range, capacitor table, start-up. All correct. Not settled by the datasheet: stability with about 40 uF spread along a 0.23 ohm feed (its charts stop at 22 uF). After USB is unplugged with the switch off, the enable pin drifts through its undefined band for up to a second, so the rail may chatter on the way down | Accepted. Try both on the first board |
+| N3 | NOTE | JLCPCB's pads for C86534 lie wholly inside the board's; rotation 0 puts its pins 1 to 5 on pads 1 to 5 | None needed |
+| N4 | NOTE | Back silkscreen Gerber, rasterised: ink 84 % of the board, 0.48 mm bare rim, no ink on any opening (nearest 0.27 mm), no ink under 0.15 mm, six slivers of 0.15 to 0.20 mm, no bare line under 0.20 mm; seven isolated dots of about 0.4 x 0.3 mm at the slider teeth's tips may print or drop out; 401 tented via holes under ink | Accepted: cosmetic |
+| N5 | NOTE | Parts-side silkscreen: nothing prints on pads; only 25 references show; BZ1 and U11 are 0.8 mm tall with 0.12 mm strokes, under JLCPCB's limits; 317 footprint lines are 0.10 to 0.12 mm (library defaults) | Left: the parts side is inside the case |
+| N6 | NOTE | Copper behind touch pads with no plane between: snout +3V3 17 mm, BOOT, EN, SCL, BUZ_P and the buttons' pads; rear flipper ACC_INT1 13.4 mm (S1), SCL 1 mm; spine 8 SCL 1.2 mm | Known |
+| N7 | NOTE | The rear-flipper touch line runs 8.9 mm on the show face (was 2.5 mm): a finger there reads as rear flipper | Accepted: it is beside that flipper |
+| N8 | NOTE | Order form: vias are tented both sides in the Gerbers; J1's two short shell slots are 1.2 mm long with a 0.6 mm tool (exactly 2:1) and may draw a query | See "Check before ordering" |
+
+Checked and found fine by the reader: every file in the zip against a fresh export; layer names and order
+(In1 one solid region, In2 tracks); a closed outline of 225.59 x 72.60 mm; drill counts; paste only on fitted
+SMD pads; mask openings; the jumpers' default bridges in copper; BOM against the schematic and JLCPCB's part
+titles; all 122 placement rows by laying JLCPCB's own footprint at the file's position and rotation (pad
+numbers and pin names agree for every polarised or keyed part; side LEDs face off the edge); the rule check
+reproduced; schematic against board, zero differences; no signal within 0.5 mm of a touch line except at the
+touch chip; nothing within 2 mm of the compass but its own nets. Not checked: stock on the day, how JLCPCB's
+reels are oriented, its rotation sign (assumed, as `jlc_cpl.py` does), how the white flood prints, panel
+rails and tabs, the regulator on the real board, anything measured.
+
 ## Placement (2026-11-23), no mechanical sign-off yet
 
 Where things are, seen from the parts side (head on the right):
@@ -703,6 +747,9 @@ I2C addresses (one bus, 2.2k pull-ups, use 100 kHz unless measured):
   every boot becomes a reboot loop.
 - After releasing RESET the module starts about 0.2 s later (U6's delay).
 - CHG_STAT reads "charging" with no cell fitted, and VBUS_DET stays high for 1 to 2 s after unplugging.
+- Keep the motion sensor's INT1 (GPIO15) still while touch is in use: its track runs 13 mm behind the
+  rear-flipper pad (release review, S1). Use it only as the deep-sleep wake line and send live events
+  (tap, tilt, free-fall) to INT2 on GPIO16. Leave the MPR121's debounce at 2 samples or more.
 - Deep-sleep wake: use the motion sensor's INT1 on GPIO15 (wake on high). Touch wake is limited (reviewer, from memory:
   one pad).
 - CircuitPython's status LED is IO48, the eye; it stays dark unless the build names GPIO21 as its
@@ -721,6 +768,26 @@ I2C addresses (one bus, 2.2k pull-ups, use 100 kHz unless measured):
 - With USB plugged in and the charge finished, the charger never sees its termination current while the
   board is awake (the board's own draw exceeds it), so it holds the cell at 4.2 V. Sleep when CHG_STAT
   goes high or after a time limit.
+
+## When the boards arrive
+
+In this order, on one board first. Each item is something no review could check.
+
+1. Before any cell or USB: look at the side LEDs (windows facing off the edge), the eye LED, the temperature
+   sensor on the tail tip, the regulator U3 and the battery connector against the placement file.
+2. The cell's polarity with a meter against the + and - marks at J2, before it is plugged in and before
+   USB. If it is the other way round: cut SJ1 and SJ2 and solder the other side of each.
+3. USB only, no cell: 3.3 V on TP2, the module appears as a USB device.
+4. Cell only, switch on, then off: the 3.3 V rail comes up cleanly and goes down (the XC6220 with this
+   board's capacitance and long feed is not covered by its datasheet). Then USB unplugged with the switch
+   off: the rail may chatter for up to a second on the way down.
+5. A Wi-Fi burst with the cell near 3.5 V: no reset (U6 trips at 2.93 V).
+6. I2C scan: 0x29, 0x2C, 0x44, 0x46, 0x5C, 0x6A.
+7. Every touch pad, and the slider end to end, with USB plugged and unplugged; the rear-flipper pad while
+   the motion sensor's INT1 is toggled on purpose (release review, S1).
+8. Spine LEDs 1 to 18 in order against the numbers on the show face; the eye; the LED current limit.
+9. The buzzer's loudness at 4 kHz (0.63 V at DC through 50 ohms: an estimate).
+10. Wake from deep sleep on motion; sleep current against the 80 to 86 uA expected.
 
 ## Not fitted by the assembler
 
@@ -748,6 +815,9 @@ I2C addresses (one bus, 2.2k pull-ups, use 100 kHz unless measured):
 | `tools/trim_dangling.py` | takes out dead-end tracks for as long as nothing comes unconnected |
 | `tools/drc_summary.py`, `tools/view_region.py` | a short reading of a KiCad DRC report; a picture of part of the board for looking at routing |
 | `routing/route_signals.ses` | the autorouter's result that the current board was made from (it is not repeatable run to run) |
+| `tools/silkscreen.py` | draws the show face's silkscreen onto the board (reversed, or `lines`); `lines look` only makes a picture |
+| `tools/title_outline.py`, `art/lettering.json` | the name and the LED numbers as plain outlines from a font file (needs matplotlib; run only to change the words or the font) |
+| `output/show_face_art.png`, `output/show_face_art_lines.png` | the show face as drawn: the reversed version on the board, and the white-on-green alternative |
 | `tools/make_upload.sh` | exports Gerbers, BOM and placement file into `fab/<name>/` |
 | `fab/draft2/` | upload set from the first routing pass, for a quote only (superseded) |
 | `lib/DinoLight.kicad_sym`, `lib/DinoLight.pretty/` | own symbols (side LED, slide switch, VLED rail) and footprints (side LED, touch anchor) |
