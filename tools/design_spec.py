@@ -166,7 +166,7 @@ def declare(d):
     d.comp('U1', 'Power_Protection:USBLC6-2SC6', 'USBLC6-2SC6', 'Package_TO_SOT_SMD:SOT-23-6', lcsc='C7519')
     d.comp('U2', 'Battery_Management:MCP73831-2-OT', 'MCP73831T-2ACI/OT', 'Package_TO_SOT_SMD:SOT-23-5', lcsc='C424093')
     d.comp('U3', 'Regulator_Linear:XC6220B331MR', 'XC6220B331MR-G', 'Package_TO_SOT_SMD:SOT-23-5', lcsc='C86534')
-    d.comp('U4', 'RF_Module:ESP32-S3-MINI-1', 'ESP32-S3-MINI-1-N8', 'RF_Module:ESP32-S2-MINI-1', lcsc='C2913206')
+    d.comp('U4', 'RF_Module:ESP32-S3-MINI-1', 'ESP32-S3-MINI-1-N4R2', 'RF_Module:ESP32-S2-MINI-1', lcsc='C3013941')   # 4 MB flash, 2 MB PSRAM; IO26 (pad 26, unconnected here) belongs to the PSRAM
     # touch controller: 12 channels on I2C (0x5C), interrupt can wake the module
     d.comp('U7', 'Sensor_Touch:MPR121QR2', 'MPR121QR2', 'Package_DFN_QFN:UQFN-20_3x3mm_P0.4mm', lcsc='C91322')
     d.comp('R33', 'Device:R', '75k 1%', R0603, lcsc='C23242')      # MPR121 reference current; 0603 is the basic part

@@ -13,9 +13,31 @@ design work and are open to change.
 
 ## State
 
-2026-11-25: ORDERED. The owner reports the board sent out for fabrication (told 2026-11-25), from
-`fab/v0.1` as rebuilt after the release review (Gerber zip md5 15493355...). Quantity, price, board options
-and what JLCPCB's placement preview showed are not recorded here yet. See "When the boards arrive".
+2026-11-26: ORDERED AS `fab/v0.1` STANDS IN THIS REPOSITORY, WITH THE 2 MB MODULE. The history: first
+uploaded on 2026-11-25 from the first v0.1 package (Gerber zip md5 da43ef1e..., the set the release review
+read, without the cell-polarity marks and with the ACC_INT1 stub). The owner then changed the order
+(2026-11-25: "I've changed the order, so we will have the 2M ram"; 2026-11-26: "Gerbers were changed").
+What is being made is therefore `fab/v0.1`: Gerber zip md5 15493355..., with the polarity marks and
+without the stub, and the BOM line for U4 naming C3013941. `dinolight.kicad_pcb` is the board as ordered.
+Quantity, price, board options and what JLCPCB's placement preview showed are not recorded here yet. See
+"When the boards arrive".
+
+The module change, 2026-11-25: U4 is ESP32-S3-MINI-1-N4R2, C3013941: 4 MB flash and 2 MB PSRAM in place
+of the N8's 8 MB flash and none. The reason: the firmware plan (a web page served by the board,
+behaviours uploaded over Wi-Fi) is tight in the N8's 512 KB.
+
+- JLCPCB's part page, read 2026-11-25: 6,219 in stock, $5.0128 (the N8 is $4.7163), extended, Standard
+  Only, X-ray, MSL 3: the same classes as the N8.
+- JLCPCB's footprint for it is the same footprint record as the N8's (73 pads, same origin).
+- The module datasheet (v1.7, in `datasheets/`): the two versions "only vary in flash and PSRAM size"; on
+  the N4R2, IO26 belongs to the PSRAM. IO26 (pad 26) has no connection on this board.
+- Changed: `tools/design_spec.py`, the schematic (regenerated: 86 nets, 0 differences), U4's value on the
+  board (a text field on the fabrication layer, nothing else), and one line of `fab/v0.1/bom_jlcpcb.csv`.
+- Checked by script: a fresh Gerber and drill export equals all 13 files in `fab/v0.1/v0.1_gerbers.zip`
+  (md5 unchanged, 15493355...); the placement file derived again from the new BOM equals
+  `fab/v0.1/cpl_jlcpcb.csv` (U4 at 177.000, -57.050, rotation 180, as before). Not read by anyone else.
+- Not known: the PSRAM's draw in deep sleep (the datasheet says only that current "might be higher", and
+  gives 40 uA for light sleep); which CircuitPython build to use (4 MB flash, 2 MB PSRAM).
 
 2026-11-24: PACKAGED FOR ORDERING AT THE OWNER'S WORD ("repackage and I'll get it made"): `fab/v0.1/`.
 Routed on four layers. The layout has had an independent review and, after the owner's changes and a fresh
@@ -141,6 +163,7 @@ The owner's upload on 2026-11-22 matched every line by C-number.
 | Part | C-number | Stock | Class | Lib | Price | KiCad footprint | Unverified |
 |---|---|---|---|---|---|---|---|
 | OPSCO SK6812SIDE-A side LED x18 | C5378721 | 137,956 | Economic and Standard | ext | $0.11 | DinoLight:LED_SK6812SIDE-A_4.0x1.6mm (own; matches JLCPCB's to 0.02 mm) | page says MSL 3, linked datasheet is the -012 variant and says MSL 5a |
+| ESP32-S3-MINI-1-N4R2 (from 2026-11-25; was the N8 below) | C3013941 | 6,219 (2026-11-25) | Standard Only, X-ray | ext | $5.01 | RF_Module:ESP32-S2-MINI-1 (JLCPCB uses one footprint record for both versions) | antenna keepout; IO26 is the PSRAM's |
 | ESP32-S3-MINI-1-N8 | C2913206 | 14,793 | Standard Only, X-ray | ext | $4.73 | RF_Module:ESP32-S2-MINI-1 (73 of 73 pads match JLCPCB's, 0.03 mm) | antenna keepout |
 | OPSCO SK6812MINI-012 top-emitting LED (eye) | C2886570 | 32,223 (2026-11-23) | Standard Only; no difficulty flag; MSL 3 on the page | ext | $0.097 | DinoLight:LED_SK6812MINI-012_3.7x3.5mm (own, from the datasheet's land pattern; JLCPCB's pads are in the same places with the same numbers, 0.2 to 0.4 mm longer at the toes) | its datasheet says MSL 5a against the page's MSL 3, so baking may still be charged; pin 1 (the chamfered corner, DIN) in the preview |
 | LSM6DS3TR-C accelerometer + gyroscope | C967633 | 24,969 | Standard Only | ext | $1.32 | LGA-14_3x2.5mm_P0.5mm_LayoutBorder3x4y (centres and numbering match the package drawing) | pin 1 in the preview; ST's own land-pattern note not read |
@@ -214,7 +237,7 @@ data runs right to left in the component-side view. VDD 3.7 to 5.5 V; VIH 0.65 V
 0.6 mA static; maker says use 70 % when all three colours are lit. Not verified: operation below 3.7 V
 (a LiPo spends much of its life at 3.6 to 3.8 V; expect blue to fade first).
 
-**ESP32-S3-MINI-1-N8 (C2913206).** Espressif datasheet v1.7 (`datasheets/ESP32-S3-MINI-1_en.pdf`).
+**ESP32-S3-MINI-1-N4R2 (C3013941; the N8, C2913206, until 2026-11-25: same datasheet, same pins except IO26, which the N4R2 keeps for its PSRAM).** Espressif datasheet v1.7 (`datasheets/ESP32-S3-MINI-1_en.pdf`).
 65 pins. TOUCH1 to 14 are GPIO1 to 14. ADC1 is GPIO1 to 10. RTC (wake-capable) GPIOs are 0 to 21.
 USB D- is GPIO19, D+ is GPIO20. Strapping: GPIO0 (pull-up, boot), GPIO3 (floating), GPIO45, GPIO46
 (pull-down). EN must not float. Deep sleep 7 to 8 uA; 18 uA with touch wake at 1 % duty.
@@ -775,8 +798,9 @@ In this order, on one board first. Each item is something no review could check.
 
 1. Before any cell or USB: look at the side LEDs (windows facing off the edge), the eye LED, the temperature
    sensor on the tail tip, the regulator U3 and the battery connector against the placement file.
-2. The cell's polarity with a meter against the + and - marks at J2, before it is plugged in and before
-   USB. If it is the other way round: cut SJ1 and SJ2 and solder the other side of each.
+2. The cell's polarity with a meter against the + and - marks at J2 (+ is pad 1, the pin nearer the
+   belly edge), before it is plugged in and before USB. If it is the other way round: cut SJ1 and SJ2 and
+   solder the other side of each.
 3. USB only, no cell: 3.3 V on TP2, the module appears as a USB device.
 4. Cell only, switch on, then off: the 3.3 V rail comes up cleanly and goes down (the XC6220 with this
    board's capacitance and long feed is not covered by its datasheet). Then USB unplugged with the switch
@@ -817,6 +841,7 @@ In this order, on one board first. Each item is something no review could check.
 | `routing/route_signals.ses` | the autorouter's result that the current board was made from (it is not repeatable run to run) |
 | `tools/silkscreen.py` | draws the show face's silkscreen onto the board (reversed, or `lines`); `lines look` only makes a picture |
 | `tools/title_outline.py`, `art/lettering.json` | the name and the LED numbers as plain outlines from a font file (needs matplotlib; run only to change the words or the font) |
+| `software/API.md`, `software/IDEAS.md`, `software/PROMPT.md` | drafts, 2026-11-25: the `dino` object that behaviours are written against; what the board can do, for people; the page to hand a model with an idea. No host program exists yet. The code examples in them were run against a throwaway stand-in, not on a board |
 | `output/show_face_art.png`, `output/show_face_art_lines.png` | the show face as drawn: the reversed version on the board, and the white-on-green alternative |
 | `tools/make_upload.sh` | exports Gerbers, BOM and placement file into `fab/<name>/` |
 | `fab/draft2/` | upload set from the first routing pass, for a quote only (superseded) |
