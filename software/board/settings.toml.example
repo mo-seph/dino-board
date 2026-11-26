@@ -1,0 +1,5 @@
+# Copy to settings.toml on the board and fill in. Leave the Wi-Fi lines out to run without a network.
+# CIRCUITPY_WIFI_SSID = "the network's name"
+# CIRCUITPY_WIFI_PASSWORD = "its password"
+# CIRCUITPY_WEB_API_PASSWORD = "a password for CircuitPython's own file editor"
+# CIRCUITPY_WEB_API_PORT = 8080

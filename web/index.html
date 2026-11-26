@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mosasauraboard</title>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<main>
+  <nav><a href="sim/">Simulator</a><a href="prompt.html">Write a behaviour with an AI</a><a href="https://github.com/mo-seph/dino-board">Source</a></nav>
+  <h1>Mosasauraboard</h1>
+  <p class="lead">A circuit board in the shape of a mosasaurus, with lights along its back, touch pads, and a handful of sensors.
+    It runs small programs called <b>behaviours</b>: one for each of its 18 lights, and any of them can be swapped for a new one.</p>
+  <p><a class="big" href="sim/">Try it in the simulator</a><a class="plain" href="prompt.html">Have an AI write a behaviour</a></p>
+  <p class="soft">The boards are being made. Until they arrive, everything here runs on a pretend one in your browser, using the same program the real board will run.</p>
+
+  <h2>What it can notice</h2>
+  <ul>
+    <li><b>Touch</b>, in five places: snout, tail, front flipper, rear flipper, and a strip along its back that knows where your finger is.</li>
+    <li><b>Movement:</b> which way up it is, tilting, shaking, tapping, spinning, and being in free fall.</li>
+    <li><b>Compass direction</b>, and magnets nearby.</li>
+    <li><b>Temperature and humidity</b>, at the tip of its tail.</li>
+    <li><b>Air pressure</b>, finely enough to tell when it has been lifted from the floor to a table.</li>
+    <li><b>Light</b>, at its nose.</li>
+  </ul>
+
+  <h2>What it can do</h2>
+  <ul>
+    <li><b>18 lights along its back</b>, any colour each, sitting above the touch strip so a light can follow your finger.</li>
+    <li><b>An eye</b>, any colour.</li>
+    <li><b>Beep.</b></li>
+    <li><b>Remember</b> a few numbers when switched off: a best score, a setting.</li>
+  </ul>
+  <p>It has no screen, microphone, camera or proper speaker, and it doesn't know the time of day.</p>
+
+  <h2>Behaviours to start from</h2>
+  <div class="card"><table>
+    <tr><th>Light</th><th>Behaviour</th><th>What you do</th><th>What it's about</th></tr>
+    <tr><td>1</td><td>Marble</td><td>Tip it: a marble of light rolls along its back and bounces off the ends</td><td>Gravity, speed, friction</td></tr>
+    <tr><td>2</td><td>Reaction timer</td><td>Wait for the eye to turn green, then touch the snout</td><td>How fast nerves are</td></tr>
+    <tr><td>3</td><td>Jump height</td><td>Hold it and jump: it times you in the air and shows the height</td><td>Free fall</td></tr>
+    <tr><td>4</td><td>Stair climber</td><td>Touch the snout at the bottom, carry it up: a light for every 25 cm</td><td>Air pressure falls as you climb</td></tr>
+    <tr><td>5</td><td>Magnet hunt</td><td>Sweep it about to find a hidden magnet</td><td>Magnetic fields</td></tr>
+    <tr><td>6</td><td>Colour mixer</td><td>Hold the flippers and tail to add red, green and blue</td><td>How screens make every colour from three</td></tr>
+    <tr><td>7</td><td>Timer</td><td>Slide to choose 1 to 18 minutes, touch the snout</td><td>Useful</td></tr>
+    <tr><td>8</td><td>Weather tail</td><td>Glance at it: temperature, humidity, and whether the pressure is rising</td><td>Useful</td></tr>
+  </table></div>
+  <p>On the board, you choose a behaviour by holding the snout and sliding a finger along its back.</p>
+
+  <h2>Think one up</h2>
+  <p>Three sentences are enough: <b>what you do to it</b> (touch, tilt, shake, carry it somewhere, shine a torch at it),
+    <b>what it does back</b> (which lights, what colours, any beeps), and <b>what it's for</b> (a game, an experiment, something useful).</p>
+  <p class="card"><i>"When I shake it, the lights fill up from the head like a battery charging, and slowly drain when I stop.
+    If I fill it right up, the eye flashes and it beeps. It's a game: how fast can you fill it?"</i></p>
+  <p>Then <a href="prompt.html">give the idea to an AI model</a> to turn into code, and try the result in the <a href="sim/">simulator</a>.</p>
+</main>
+</body>
+</html>

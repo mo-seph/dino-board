@@ -1,7 +1,9 @@
 # The `dino` API: rough draft
 
-Draft of 2026-11-25. Nothing here is built yet. This is the proposal that the host program, the
-simulator and [PROMPT.md](PROMPT.md) will all be written against, so change it here first.
+First written 2026-11-25. As of 2026-11-26 everything here except the "Later" section is built in
+`board/dino/` and runs in the tests and the web simulator; none of it has run on a real board yet. The
+host program, the simulator and [PROMPT.md](PROMPT.md) are all written against this page, so change it
+here first.
 
 ## The idea
 
@@ -109,7 +111,7 @@ The slider also has:
 |---|---|
 | `dino.accel.x`, `.y`, `.z` | Which way is up, and how hard it is being pushed, in g. `x` points out of the nose, `y` out of the back (the LED edge), `z` out of the picture side. Held still, the direction pointing at the sky reads +1 |
 | `dino.up` | The part pointing at the sky: `"spine"`, `"belly"`, `"nose"`, `"tail"`, `"face"` (lying picture side up) or `"underside"` |
-| `dino.spin.x`, `.y`, `.z` | Turning speed in degrees per second. `z` is spinning flat on a table |
+| `dino.spin.x`, `.y`, `.z` | Turning speed in degrees per second. `z` is spinning flat on a table: positive is clockwise, looking at the picture |
 | `dino.shake` | How hard it is being shaken, 0 to 1 |
 | `dino.shaken` | True for one `update` when a shake starts |
 | `dino.tapped` | True for one `update` when it is tapped or knocked |

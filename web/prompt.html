@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Write a behaviour with an AI</title>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<main>
+  <nav><a href="./">Mosasauraboard</a><a href="sim/">Simulator</a></nav>
+  <h1>Write a behaviour with an AI</h1>
+  <p class="lead">Describe what you want the dinosaur to do. This page adds everything an AI model needs to know about the board, ready to paste into any AI chat.</p>
+  <ol>
+    <li><b>Write your idea</b>: what you do to it, what it does back, and what it's for.
+      <textarea id="idea" rows="5" placeholder="When I shake it, the lights fill up from the head like a battery charging, and slowly drain when I stop…"></textarea></li>
+    <li><button class="big" id="copy">Copy the prompt with my idea</button> <span id="done" class="soft"></span></li>
+    <li><b>Paste it</b> into an AI chat (Claude, ChatGPT, Gemini or another) and send it.</li>
+    <li><b>Copy the code</b> it gives back, open the <a href="sim/">simulator</a>, pick a light, paste the code over what is there and press <b>Run it</b>.</li>
+    <li>If it stops with an error, press <b>Copy the error</b> in the simulator and paste that back to the AI.</li>
+  </ol>
+  <h2>What gets copied</h2>
+  <p class="soft">Nothing is sent anywhere by this page: it only puts text on your clipboard.</p>
+  <pre id="prompt">Loading…</pre>
+</main>
+<script>
+"use strict";
+const MARK = "(Write the idea here: what you do to the board, what it does back, and what it is for.)";
+let prompt = "";
+const whole = () => { const idea = document.getElementById("idea").value.trim(); return idea ? prompt.replace(MARK, idea) : prompt; };
+const show = () => { document.getElementById("prompt").textContent = whole(); };
+fetch("../software/PROMPT.md", {cache: "no-cache"}).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+  .then(t => { prompt = t; if (!t.includes(MARK)) console.warn("the prompt has no place for the idea"); show(); })
+  .catch(e => { document.getElementById("prompt").textContent = "Could not load the prompt: " + e.message; });
+document.getElementById("idea").addEventListener("input", show);
+document.getElementById("copy").addEventListener("click", async () => {
+  const done = document.getElementById("done");
+  if (!prompt) { done.textContent = "The prompt has not loaded yet."; return; }
+  try { await navigator.clipboard.writeText(whole()); done.textContent = document.getElementById("idea").value.trim() ? "Copied. Paste it into an AI chat." : "Copied, but with no idea in it yet: add yours at the end."; }
+  catch (e) { done.textContent = "Could not copy: select the text below and copy it yourself."; }
+});
+</script>
+</body>
+</html>

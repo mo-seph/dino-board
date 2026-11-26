@@ -25,7 +25,9 @@ decision and its reason, the parts list with stock checks, the review findings, 
 | `tools/patch_route.py`, `tools/trim_dangling.py` | Finish what the autorouter leaves open; tie in ground; tidy |
 | `tools/silkscreen.py` | Draws the show face's silkscreen: the mosasaurus, touch pad outlines, LED numbers, the name |
 | `tools/title_outline.py`, `art/lettering.json` | The lettering as plain outlines, made once from a font file |
-| `software/API.md`, `software/IDEAS.md`, `software/PROMPT.md` | Drafts for the programs the board will run: what a behaviour can read and control, a guide for people thinking up behaviours, and a page to give an AI model with an idea. Nothing is built yet |
+| `software/` | The programs the board runs: the `dino` library, the host program, eight behaviours, tests, and the documents for people and for AI models writing behaviours. Start at `software/README.md` |
+| `web/` | The website: a landing page, a simulator that runs the board's own Python in a browser, and a page for writing a behaviour with an AI |
+| `tools/sim_shape.py` | The board's outline, LED positions and touch-pad shapes for the simulator, read from the board file |
 | `tools/freerouting_capped.sh` | Runs the Freerouting autorouter for a set number of passes |
 | `routing/route_signals.ses` | The autorouter's last result, kept because it differs run to run |
 | `outline/` | The outline generator and its SVG / PNG |

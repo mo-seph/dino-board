@@ -741,6 +741,14 @@ I2C addresses (one bus, 2.2k pull-ups, use 100 kHz unless measured):
 | 0x5C | U7 MPR121 touch | adafruit_mpr121 (pass the address) |
 | 0x6A | U5 LSM6DS3TR-C accelerometer and gyroscope | adafruit_lsm6ds (LSM6DS3TRC) |
 
+- The firmware is in `software/` (2026-11-26). Read from the libraries' and CircuitPython's source on that
+  day, not tried on hardware: build to try first `generic_esp32s3_supermini` (status LED on GPIO48 = the
+  eye, no LED power pin; the Adafruit Feather ESP32-S3 4 MB / 2 MB build would drive GPIO21, the LED
+  rail switch, as its LED power pin); `adafruit_qmc5883p`'s `magnetic` is in gauss although its
+  docstring says microtesla; `adafruit_ltr329_ltr303` gives raw counts, not lux; `adafruit_bmp5xx` is
+  opened with `BMP5XX.over_i2c(i2c, address=0x46)`; `adafruit_lsm6ds` does not expose the chip's tap or
+  free-fall detectors or its interrupt routing (raw register writes needed); deep-sleep pin alarms on
+  this chip are level only.
 - Claim every pin at start-up. CircuitPython pulls unclaimed pins up through about 45k: the gate pull-downs
   hold against that, but the motion sensor's interrupt pins (driven low) waste 73 uA each until claimed
   as inputs with no pull.
@@ -841,7 +849,8 @@ In this order, on one board first. Each item is something no review could check.
 | `routing/route_signals.ses` | the autorouter's result that the current board was made from (it is not repeatable run to run) |
 | `tools/silkscreen.py` | draws the show face's silkscreen onto the board (reversed, or `lines`); `lines look` only makes a picture |
 | `tools/title_outline.py`, `art/lettering.json` | the name and the LED numbers as plain outlines from a font file (needs matplotlib; run only to change the words or the font) |
-| `software/API.md`, `software/IDEAS.md`, `software/PROMPT.md` | drafts, 2026-11-25: the `dino` object that behaviours are written against; what the board can do, for people; the page to hand a model with an idea. No host program exists yet. The code examples in them were run against a throwaway stand-in, not on a board |
+| `software/` | the firmware and its documents, started 2026-11-26: see `software/README.md`. The `dino` library, host program and eight behaviours pass 45 desktop tests on a pretend board. `software/board/dino/hw_board.py`, `code.py` and `boot.py` have never run: every bench question in them is marked CHECK |
+| `web/`, `tools/sim_shape.py` | the website (landing page, simulator, write-with-an-AI page) and the board shape the simulator draws. Not yet opened in a real browser by the assistant: its script was run under Node against stand-ins. Not published anywhere |
 | `output/show_face_art.png`, `output/show_face_art_lines.png` | the show face as drawn: the reversed version on the board, and the white-on-green alternative |
 | `tools/make_upload.sh` | exports Gerbers, BOM and placement file into `fab/<name>/` |
 | `fab/draft2/` | upload set from the first routing pass, for a quote only (superseded) |

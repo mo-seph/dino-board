@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mosasauraboard simulator</title>
+<style>
+  :root { --bg:#f4f1ea; --fg:#1c2421; --soft:#5d6a65; --card:#fffdf8; --line:#d8d2c4; --accent:#0a7d6c; --bad:#b3261e; --board:#16352e; --pad:#2c5a4f; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#111614; --fg:#e7ece9; --soft:#9aa8a3; --card:#1a211f; --line:#2c3633; --accent:#4fd1b8; --bad:#ff8a80; --board:#0c211c; --pad:#1f4a40; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { padding:12px 16px 0; display:flex; flex-wrap:wrap; gap:6px 16px; align-items:baseline; }
+  h1 { font-size:20px; margin:0; }
+  h2 { font-size:15px; margin:0 0 8px; }
+  a { color:var(--accent); }
+  #state { color:var(--soft); font-size:13px; }
+  main { padding:8px 16px 32px; max-width:1180px; margin:0 auto; }
+  #stage { background:#0b0f0e; border-radius:12px; padding:6px; touch-action:none; user-select:none; -webkit-user-select:none; }
+  #stage svg { display:block; width:100%; height:auto; }
+  #outline { fill:var(--board); }
+  .pad { fill:var(--pad); stroke:#7fb8a8; stroke-width:.35; cursor:pointer; }
+  .pad.on { fill:#e9c46a; }
+  .hint { color:var(--soft); font-size:13px; margin:6px 2px 12px; }
+  .grid { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:14px; }
+  @media (max-width: 820px) { .grid { grid-template-columns:1fr; } }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; }
+  button, select { font:inherit; color:var(--fg); background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:5px 10px; cursor:pointer; }
+  button:hover { border-color:var(--accent); }
+  button.primary { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+  @media (prefers-color-scheme: dark) { button.primary { color:#06231d; } }
+  button.latched { background:#e9c46a; color:#1c2421; border-color:#e9c46a; }
+  #slots { display:grid; grid-template-columns:repeat(9, 1fr); gap:5px; margin-bottom:8px; }
+  #slots button { padding:4px 0; font-size:13px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+  #slots button .dot { width:12px; height:12px; border-radius:50%; border:1px solid var(--line); }
+  #slots button.sel { outline:2px solid var(--accent); }
+  #slots button.run { font-weight:700; }
+  #slots button.err { border-color:var(--bad); color:var(--bad); }
+  #title { font-weight:600; margin:2px 0 6px; }
+  textarea { width:100%; height:330px; font:13px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background:var(--bg); color:var(--fg);
+             border:1px solid var(--line); border-radius:8px; padding:8px; resize:vertical; tab-size:4; white-space:pre; overflow:auto; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:8px 0 0; }
+  #error { display:none; margin-top:8px; padding:8px; border:1px solid var(--bad); border-radius:8px; color:var(--bad); font:13px/1.4 ui-monospace, Menlo, monospace; white-space:pre-wrap; }
+  .ctl { display:grid; grid-template-columns:104px 1fr 76px; gap:6px 8px; align-items:center; margin:5px 0; }
+  .ctl output { text-align:right; font-variant-numeric:tabular-nums; color:var(--soft); font-size:13px; }
+  input[type=range] { width:100%; accent-color:var(--accent); }
+  .sub { margin:12px 0 4px; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--soft); }
+  kbd { border:1px solid var(--line); border-radius:4px; padding:0 4px; font:12px ui-monospace, Menlo, monospace; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Mosasauraboard simulator</h1>
+  <span id="state">Starting Python…</span>
+</header>
+<main>
+  <div id="stage"><svg id="svg" viewBox="-4 8 242 94" xmlns="http://www.w3.org/2000/svg">
+    <defs><filter id="glow" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="2.2"/></filter></defs>
+    <g id="glows"></g><path id="outline" stroke="#3d6f62" stroke-width=".4"/>
+    <g id="spine"></g><g id="pads"></g><g id="lamps"></g>
+    <circle id="eyeglow" r="7" filter="url(#glow)" fill="#000" opacity="0"/><circle id="eye" r="2.6" fill="#000" stroke="#3d6f62" stroke-width=".4"/>
+  </svg></div>
+  <p class="hint">Touch or click the snout, tail, flippers and the strip along the back. To change behaviour the way the real board does,
+    hold the snout and slide along the back: with a mouse, press <b>Hold snout</b> first. Keys: <kbd>S</kbd> snout, <kbd>T</kbd> tail, <kbd>F</kbd> front flipper, <kbd>R</kbd> rear flipper.
+    <button id="holdsnout">Hold snout</button> <label><input type="checkbox" id="sound"> Sound</label></p>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Behaviours: one for each light</h2>
+      <div id="slots"></div>
+      <div id="title"></div>
+      <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+      <div class="row">
+        <button class="primary" id="run">Run it</button>
+        <button id="restore">Put the original back</button>
+        <button id="download">Save as a file</button>
+        <a href="../prompt.html">Have an AI write one</a>
+      </div>
+      <div id="error"></div>
+      <div class="row" id="errorrow" style="display:none"><button id="copyerror">Copy the error (to give back to the AI)</button></div>
+    </section>
+
+    <section class="card">
+      <h2>What the board feels</h2>
+      <div class="sub">Movement</div>
+      <div class="ctl"><label for="up">Pointing up</label>
+        <select id="up"><option value="spine">its back (standing)</option><option value="face">the picture (lying flat)</option><option value="underside">the underside</option>
+          <option value="belly">its belly (upside down)</option><option value="nose">its nose</option><option value="tail">its tail</option></select><output></output></div>
+      <div class="ctl"><label for="tilt">Tilt</label><input type="range" id="tilt" min="-1" max="1" step="0.01" value="0"><output id="tiltv">level</output></div>
+      <div class="ctl"><label for="spin">Spin</label><input type="range" id="spin" min="-720" max="720" step="10" value="0"><output id="spinv">0 °/s</output></div>
+      <div class="row"><button id="shake">Shake</button><button id="tap">Tap</button><button id="jump">Jump</button>
+        <label>air time <input type="range" id="air" min="0.1" max="0.8" step="0.02" value="0.4" style="width:90px"> <output id="airv">0.40 s</output></label></div>
+      <div class="row"><button id="motion">Use this device's own movement</button><span id="motionnote" class="hint" style="margin:0"></span></div>
+      <div class="sub">The world around it</div>
+      <div class="ctl"><label for="temp">Temperature</label><input type="range" id="temp" min="-10" max="45" step="0.5" value="20"><output id="tempv"></output></div>
+      <div class="ctl"><label for="hum">Humidity</label><input type="range" id="hum" min="0" max="100" step="1" value="50"><output id="humv"></output></div>
+      <div class="ctl"><label for="height">Height</label><input type="range" id="height" min="-2" max="10" step="0.05" value="0"><output id="heightv"></output></div>
+      <div class="ctl"><label for="light">Light</label><input type="range" id="light" min="0" max="4.5" step="0.01" value="2.3"><output id="lightv"></output></div>
+      <div class="ctl"><label for="heading">Nose points</label><input type="range" id="heading" min="0" max="359" step="1" value="0"><output id="headingv"></output></div>
+      <div class="ctl"><label for="magnet">Magnet nearby</label><input type="range" id="magnet" min="0" max="3.3" step="0.01" value="0"><output id="magnetv"></output></div>
+      <div class="ctl"><label for="battery">Battery</label><input type="range" id="battery" min="0" max="1" step="0.01" value="0.8"><output id="batteryv"></output></div>
+      <div class="row"><label><input type="checkbox" id="plugged" checked> Plugged in to USB</label></div>
+    </section>
+  </div>
+  <p class="hint">This runs the same Python as the real board (its <code>dino</code> library and host program) in your browser, with pretend hardware.
+    Nothing you type leaves this page; your changes are kept in this browser only. <button id="forget">Forget my changes</button></p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const BOARD = "../../software/board/", SIM = "../../software/sim/";
+const LIB = ["__init__.py", "colour.py", "leds.py", "touch.py", "core.py", "host.py"];
+const PADS = ["snout", "tail", "front_flipper", "rear_flipper"];
+const BLANK = n => `"""Say here what it does and how to use it."""\nNAME = "New behaviour"\nCOLOUR = "white"\n\n\ndef init(dino):\n    pass\n\n\ndef update(dino):\n    dino.leds.fill("off")\n    dino.leds.dot(dino.slider.pos, "white")\n`;
+
+const inp = { pads: {snout:false, tail:false, front_flipper:false, rear_flipper:false}, slider_touched:false, slider_pos:0.5,
+              accel:[0,1,0], spin:[0,0,0], mag:[20,0,-43], temperature:20, humidity:50, pressure:1013.25, lux:200, battery:0.8, plugged_in:true };
+const pointer = {snout:false, tail:false, front_flipper:false, rear_flipper:false}, keys = {...pointer};
+let holdSnout = false, shakeUntil = 0, tapFrames = 0, jumpUntil = 0, device = null, frameNo = 0;
+let shape, py, frameFn, originals = {}, selected = 1, status = null, lamps = [], glows = [], audio = null, osc = null, gain = null;
+
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+                set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+                del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
+
+// ---------- drawing ----------
+function el(name, attrs, parent) { const e = document.createElementNS(NS, name); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; }
+const path = rings => rings.map(r => "M" + r.map(p => p.join(" ")).join("L") + "Z").join("");
+function draw() {
+  $("outline").setAttribute("d", path([shape.outline]));
+  shape.spine.forEach(rings => el("path", {d: path(rings), class: "pad slider"}, $("spine")));
+  for (const name of PADS) el("path", {d: path(shape.pads[name]), class: "pad", "data-pad": name}, $("pads"));
+  shape.leds.forEach(([x, y], i) => {
+    const a = shape.leds[Math.max(i - 1, 0)], b = shape.leds[Math.min(i + 1, 17)];
+    let nx = -(b[1] - a[1]), ny = b[0] - a[0]; const L = Math.hypot(nx, ny); nx /= L; ny /= L; if (ny > 0) { nx = -nx; ny = -ny; }   // out of the back
+    const ang = Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI;
+    glows.push(el("circle", {cx: x + nx * 4.5, cy: y + ny * 4.5, r: 5.5, filter: "url(#glow)", fill: "#000", opacity: 0}, $("glows")));
+    lamps.push(el("rect", {x: x - 2, y: y - 0.8, width: 4, height: 1.6, rx: .4, fill: "#000", stroke: "#3d6f62", "stroke-width": .25, transform: `rotate(${ang} ${x} ${y})`}, $("lamps")));
+    const t = el("text", {x: x - nx * 3.2, y: y - ny * 3.2 + 1, "font-size": 2.4, "text-anchor": "middle", fill: "#7fb8a8", "pointer-events": "none"}, $("lamps")); t.textContent = i + 1;
+  });
+  for (const id of ["eye", "eyeglow"]) { $(id).setAttribute("cx", shape.eye[0]); $(id).setAttribute("cy", shape.eye[1]); }
+}
+const screenColour = ([r, g, b]) => { const f = v => Math.round(255 * Math.pow(v / 255, 0.45)); return `rgb(${f(r)},${f(g)},${f(b)})`; };
+function paint(out) {
+  out.pixels.forEach((p, i) => { const on = Math.max(...p) > 0, c = screenColour(p);
+    lamps[i].setAttribute("fill", on ? c : "#0a0a0a"); glows[i].setAttribute("fill", c); glows[i].setAttribute("opacity", on ? 0.95 : 0); });
+  const on = Math.max(...out.eye) > 0, c = screenColour(out.eye);
+  $("eye").setAttribute("fill", on ? c : "#0a0a0a"); $("eyeglow").setAttribute("fill", c); $("eyeglow").setAttribute("opacity", on ? 0.9 : 0);
+  document.querySelectorAll("[data-pad]").forEach(e => e.classList.toggle("on", inp.pads[e.dataset.pad]));
+  document.querySelectorAll(".slider").forEach(e => e.classList.toggle("on", inp.slider_touched));
+  sound(out.hz);
+}
+function sound(hz) {
+  if (!$("sound").checked || !audio) { if (gain) gain.gain.value = 0; return; }
+  if (hz > 0) { osc.frequency.value = hz; gain.gain.value = 0.04; } else gain.gain.value = 0;
+}
+$("sound").addEventListener("change", () => {
+  if ($("sound").checked && !audio) { audio = new (window.AudioContext || window.webkitAudioContext)(); osc = audio.createOscillator(); osc.type = "square";
+    gain = audio.createGain(); gain.gain.value = 0; osc.connect(gain).connect(audio.destination); osc.start(); }
+  if (audio && audio.state === "suspended") audio.resume();
+});
+
+// ---------- touch ----------
+function svgPoint(e) { const m = $("svg").getScreenCTM().inverse(); return [e.clientX * m.a + e.clientY * m.c + m.e, e.clientX * m.b + e.clientY * m.d + m.f]; }
+function sliderPos(e) {                       // nearest place along the row of LEDs: 0 at LED 1, 1 at LED 18
+  const [px, py] = svgPoint(e); let best = 1e9, pos = 0;
+  for (let i = 0; i < 17; i++) { const [ax, ay] = shape.leds[i], [bx, by] = shape.leds[i + 1], dx = bx - ax, dy = by - ay;
+    const t = Math.min(Math.max(((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy), 0), 1), d = Math.hypot(px - ax - t * dx, py - ay - t * dy);
+    if (d < best) { best = d; pos = (i + t) / 17; } }
+  return pos;
+}
+function wireTouch() {
+  document.querySelectorAll("[data-pad]").forEach(e => {
+    const name = e.dataset.pad, off = () => { pointer[name] = false; };
+    e.addEventListener("pointerdown", ev => { e.setPointerCapture(ev.pointerId); pointer[name] = true; ev.preventDefault(); });
+    e.addEventListener("pointerup", off); e.addEventListener("pointercancel", off); e.addEventListener("lostpointercapture", off);
+  });
+  const g = $("spine"), off = () => { inp.slider_touched = false; };
+  g.addEventListener("pointerdown", ev => { g.setPointerCapture(ev.pointerId); inp.slider_touched = true; inp.slider_pos = sliderPos(ev); ev.preventDefault(); });
+  g.addEventListener("pointermove", ev => { if (inp.slider_touched) inp.slider_pos = sliderPos(ev); });
+  g.addEventListener("pointerup", off); g.addEventListener("pointercancel", off); g.addEventListener("lostpointercapture", off);
+  const keyOf = {s: "snout", t: "tail", f: "front_flipper", r: "rear_flipper"};
+  const typing = () => ["TEXTAREA", "INPUT", "SELECT"].includes(document.activeElement.tagName);
+  addEventListener("keydown", e => { if (!typing() && keyOf[e.key.toLowerCase()]) keys[keyOf[e.key.toLowerCase()]] = true; });
+  addEventListener("keyup", e => { if (keyOf[e.key.toLowerCase()]) keys[keyOf[e.key.toLowerCase()]] = false; });
+  $("holdsnout").addEventListener("click", () => { holdSnout = !holdSnout; $("holdsnout").classList.toggle("latched", holdSnout); });
+}
+
+// ---------- the controls ----------
+const UPS = {spine: [0,1,0], belly: [0,-1,0], nose: [1,0,0], tail: [-1,0,0], face: [0,0,1], underside: [0,0,-1]};
+function readControls(now) {
+  for (const n of PADS) inp.pads[n] = pointer[n] || keys[n] || (n === "snout" && holdSnout);
+  const tilt = +$("tilt").value, up = $("up").value, base = UPS[up];
+  let a = (up === "nose" || up === "tail") ? base.slice() : [tilt, base[1] * Math.sqrt(1 - tilt * tilt), base[2] * Math.sqrt(1 - tilt * tilt)];
+  $("tiltv").textContent = (up === "nose" || up === "tail") ? "–" : Math.abs(tilt) < 0.02 ? "level" : (tilt > 0 ? "nose up " : "nose down ") + Math.round(Math.asin(Math.abs(tilt)) * 180 / Math.PI) + "°";
+  let spin = [0, 0, +$("spin").value];
+  if (device) { a = device.accel; spin = device.spin; }
+  else {
+    if (now < shakeUntil) a = [a[0] + (frameNo % 2 ? 1.6 : -1.6), a[1], a[2]];
+    if (tapFrames > 0) { a = [a[0], a[1] + 1.6, a[2]]; tapFrames--; }
+    if (now < jumpUntil) a = [0, 0.02, 0];
+  }
+  inp.accel = a; inp.spin = spin;
+  $("spinv").textContent = spin[2].toFixed(0) + " °/s";
+  inp.temperature = +$("temp").value; $("tempv").textContent = inp.temperature.toFixed(1) + " °C";
+  inp.humidity = +$("hum").value; $("humv").textContent = inp.humidity + " %";
+  const h = +$("height").value; inp.pressure = 1013.25 * Math.pow(1 - h / 44330, 1 / 0.1903);
+  $("heightv").textContent = h.toFixed(2) + " m";
+  inp.lux = Math.pow(10, +$("light").value) - 1; $("lightv").textContent = inp.lux < 10 ? inp.lux.toFixed(1) + " lux" : Math.round(inp.lux) + " lux";
+  const hd = +$("heading").value * Math.PI / 180, extra = Math.pow(10, +$("magnet").value) - 1;
+  inp.mag = [20 * Math.cos(hd) + extra, -20 * Math.sin(hd), -43];
+  $("headingv").textContent = ["N","NE","E","SE","S","SW","W","NW"][Math.round(+$("heading").value / 45) % 8] + " " + $("heading").value + "°";
+  $("magnetv").textContent = extra < 1 ? "none" : "+" + Math.round(extra) + " µT";
+  inp.battery = +$("battery").value; $("batteryv").textContent = Math.round(inp.battery * 100) + " %";
+  inp.plugged_in = $("plugged").checked;
+  $("airv").textContent = (+$("air").value).toFixed(2) + " s";
+}
+$("shake").addEventListener("click", () => { shakeUntil = performance.now() / 1000 + 1.2; });
+$("tap").addEventListener("click", () => { tapFrames = 1; });
+$("jump").addEventListener("click", () => { jumpUntil = performance.now() / 1000 + +$("air").value; });
+
+// A phone or tablet can be the dinosaur: hold it with this picture facing you. Experimental: browsers disagree about signs.
+$("motion").addEventListener("click", async () => {
+  if (device) { device = null; removeEventListener("devicemotion", onMotion); $("motion").textContent = "Use this device's own movement"; $("motionnote").textContent = ""; return; }
+  if (typeof DeviceMotionEvent === "undefined") { $("motionnote").textContent = "This device has no movement sensor a web page can read."; return; }
+  try { if (DeviceMotionEvent.requestPermission && await DeviceMotionEvent.requestPermission() !== "granted") { $("motionnote").textContent = "Permission was refused."; return; } }
+  catch (e) { $("motionnote").textContent = "Could not ask for permission: " + e.message; return; }
+  device = {accel: [0, 1, 0], spin: [0, 0, 0]}; addEventListener("devicemotion", onMotion);
+  $("motion").textContent = "Stop using this device's movement"; $("motionnote").textContent = "Tilt, shake and jump with the device itself.";
+});
+function onMotion(e) {
+  const g = e.accelerationIncludingGravity; if (!g || g.x === null) return;
+  const apple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const s = (apple ? -1 : 1) / 9.80665;                                   // Safari reports the opposite sign to everyone else
+  const th = ((screen.orientation && screen.orientation.angle) || window.orientation || 0) * Math.PI / 180;
+  const sx = g.x * Math.cos(th) - g.y * Math.sin(th), sy = g.x * Math.sin(th) + g.y * Math.cos(th);   // across and up the screen as held
+  device.accel = [-sx * s, sy * s, g.z * s];                              // the picture's nose is to the left
+  const r = e.rotationRate; if (r && r.alpha !== null) device.spin = [r.beta || 0, r.gamma || 0, r.alpha || 0];
+}
+
+// ---------- behaviours ----------
+function showSlots() {
+  const box = $("slots"); box.innerHTML = "";
+  status.slots.forEach(s => {
+    const b = document.createElement("button");
+    b.title = s.name || "empty"; b.className = (s.number === selected ? "sel " : "") + (s.number === status.current ? "run " : "") + (s.error ? "err" : "");
+    b.innerHTML = `<span>${s.number}</span><span class="dot" style="background:${s.loaded ? cssColour(s.colour) : "transparent"}"></span>`;
+    b.addEventListener("click", () => select(s.number, true)); box.appendChild(b);
+  });
+  const s = status.slots[selected - 1];
+  $("title").textContent = `Light ${selected}: ` + (s.loaded || s.error ? s.name : "empty");
+  $("error").style.display = $("errorrow").style.display = s.error ? "block" : "none"; $("error").textContent = s.error || "";
+  $("restore").style.display = originals[selected] !== undefined ? "" : "none";
+}
+const cssColour = c => Array.isArray(c) ? `rgb(${c.map(Math.round).join(",")})` : ({off: "transparent"}[c] || c);
+function sourceOf(n) { const s = py.runPython(`host.slots[${n - 1}].source`); return s === undefined || s === null ? null : s; }
+function select(n, start) {
+  selected = n; const src = sourceOf(n);
+  $("code").value = src === null ? BLANK(n) : src;
+  if (start && src !== null) py.runPython(`host.select(${n})`);
+  refresh();
+}
+function refresh() { status = JSON.parse(py.runPython("json.dumps(host.status())")); showSlots(); }
+function run() {
+  const src = $("code").value; py.globals.set("_src", src);
+  const file = status.slots[selected - 1].file || `${String(selected).padStart(2, "0")}_new.py`;
+  py.runPython(`host.load_source(${selected}, _src, ${JSON.stringify(file)}); host.select(${selected})`);
+  if (src !== originals[selected]) store.set("dino-slot-" + selected, src); else store.del("dino-slot-" + selected);
+  refresh();
+}
+$("run").addEventListener("click", run);
+$("code").addEventListener("keydown", e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); run(); }
+  if (e.key === "Tab") { e.preventDefault(); const t = e.target, at = t.selectionStart; t.setRangeText("    ", at, t.selectionEnd, "end"); }
+});
+$("restore").addEventListener("click", () => { $("code").value = originals[selected]; run(); });
+$("download").addEventListener("click", () => {
+  const file = status.slots[selected - 1].file || `${String(selected).padStart(2, "0")}_new.py`, a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([$("code").value], {type: "text/x-python"})); a.download = file; a.click(); URL.revokeObjectURL(a.href);
+});
+$("copyerror").addEventListener("click", async () => {
+  const text = "This behaviour stopped with an error:\n\n" + $("error").textContent + "\n\nHere is the file:\n\n" + $("code").value;
+  try { await navigator.clipboard.writeText(text); $("copyerror").textContent = "Copied"; } catch (e) { $("copyerror").textContent = "Could not copy: select the text instead"; }
+  setTimeout(() => { $("copyerror").textContent = "Copy the error (to give back to the AI)"; }, 2000);
+});
+$("forget").addEventListener("click", () => { for (let n = 1; n <= 18; n++) store.del("dino-slot-" + n); location.reload(); });
+
+// ---------- starting up ----------
+async function text(url) { const r = await fetch(url, {cache: "no-cache"}); if (!r.ok) throw new Error(url + ": " + r.status); return r.text(); }
+async function boot() {
+  shape = JSON.parse(await text("shape.json")); draw(); wireTouch();
+  py = await loadPyodide();
+  for (const d of ["/board", "/board/dino", "/board/behaviours", "/sim"]) py.FS.mkdirTree(d);
+  const names = JSON.parse(await text(BOARD + "behaviours/index.json"));
+  await Promise.all([
+    ...LIB.map(async f => py.FS.writeFile("/board/dino/" + f, await text(BOARD + "dino/" + f))),
+    ...names.map(async f => { const src = await text(BOARD + "behaviours/" + f); originals[parseInt(f, 10)] = src; py.FS.writeFile("/board/behaviours/" + f, src); }),
+    (async () => py.FS.writeFile("/sim/hw_fake.py", await text(SIM + "hw_fake.py")))(),
+  ]);
+  py.runPython(`
+import sys, json
+sys.path[:0] = ["/board", "/sim"]
+from dino.host import Host
+from hw_fake import FakeHardware
+hw = FakeHardware()
+host = Host(hw, "/board/behaviours", "/saved")
+host.start()
+def frame(now, inputs):
+    hw.clock = now
+    hw.set_inputs(inputs)
+    host.step()
+    return hw.output()
+`);
+  frameFn = py.globals.get("frame");
+  for (let n = 1; n <= 18; n++) { const mine = store.get("dino-slot-" + n);
+    if (mine !== null) { py.globals.set("_src", mine); py.runPython(`host.load_source(${n}, _src, host.slots[${n - 1}].file or "${String(n).padStart(2, "0")}_new.py")`); } }
+  refresh(); select(status.current || 1, false);
+  let last = 0, shownState = "";
+  function tick(ms) {
+    requestAnimationFrame(tick);
+    if (ms - last < 30) return;                      // about 30 frames a second, like the board
+    last = ms; frameNo++;
+    readControls(ms / 1000);
+    paint(JSON.parse(frameFn(ms / 1000, JSON.stringify(inp))));
+    if (frameNo % 8 === 0) {
+      const st = py.runPython("json.dumps([host.menu, host.running, host.current.number if host.current else None, host.current.error if host.current else None, host.cursor])");
+      if (st !== shownState) { shownState = st; const [menu, running, cur, err, cursor] = JSON.parse(st); refresh();
+        $("state").textContent = menu ? `Choosing: light ${cursor + 1}` : err ? `Light ${cur} stopped with an error` : running ? `Running light ${cur}: ${status.slots[cur - 1].name}` : "Nothing running"; }
+    }
+  }
+  requestAnimationFrame(tick);
+}
+boot().catch(e => { $("state").textContent = "Could not start: " + e.message; console.error(e); });
+</script>
+</body>
+</html>
