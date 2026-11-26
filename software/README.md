@@ -45,7 +45,12 @@ simulator page runs.
 
 ## The simulator
 
-It needs a web server, because the page fetches the Python files:
+It is live at https://mo-seph.github.io/dino-board/web/sim/ (GitHub Pages serves this repository's top
+folder; `.nojekyll` there is what lets it serve `dino/__init__.py`). A push to `main` updates it within
+a minute or two.
+
+To run it from a copy on your own computer it needs a web server, because the page fetches the Python
+files:
 
 ```bash
 python3 -m http.server 8765
@@ -54,10 +59,9 @@ python3 -m http.server 8765
 Run that in the repository's top folder and open `http://localhost:8765/web/sim/`. The page loads
 Pyodide (Python in the browser) from the jsDelivr network, so it needs the internet the first time.
 
-**Not yet seen in a real browser** (2026-11-26). The page's script was run under Node against a
-stand-in page and a stand-in Python, and its Python side is tested; the look of it, the touch handling
-and the use of a tablet's own movement sensor have not been tried. The movement sensor part is marked
-experimental on the page: browsers disagree about signs.
+Seen working on GitHub Pages on 2026-11-26, by the owner and by the assistant (pages load, the
+behaviours run). Not tried: a tablet's own movement sensor, which is marked experimental on the page
+because browsers disagree about signs.
 
 ## Putting it on a board
 

@@ -850,7 +850,7 @@ In this order, on one board first. Each item is something no review could check.
 | `tools/silkscreen.py` | draws the show face's silkscreen onto the board (reversed, or `lines`); `lines look` only makes a picture |
 | `tools/title_outline.py`, `art/lettering.json` | the name and the LED numbers as plain outlines from a font file (needs matplotlib; run only to change the words or the font) |
 | `software/` | the firmware and its documents, started 2026-11-26: see `software/README.md`. The `dino` library, host program and eight behaviours pass 45 desktop tests on a pretend board. `software/board/dino/hw_board.py`, `code.py` and `boot.py` have never run: every bench question in them is marked CHECK |
-| `web/`, `tools/sim_shape.py` | the website (landing page, simulator, write-with-an-AI page) and the board shape the simulator draws. Not yet opened in a real browser by the assistant: its script was run under Node against stand-ins. Not published anywhere |
+| `web/`, `tools/sim_shape.py` | the website (landing page, simulator, write-with-an-AI page) and the board shape the simulator draws. Published 2026-11-26 at https://mo-seph.github.io/dino-board/ by GitHub Pages from the top folder of `main` (the owner turned it on); the simulator was seen working there the same day |
 | `output/show_face_art.png`, `output/show_face_art_lines.png` | the show face as drawn: the reversed version on the board, and the white-on-green alternative |
 | `tools/make_upload.sh` | exports Gerbers, BOM and placement file into `fab/<name>/` |
 | `fab/draft2/` | upload set from the first routing pass, for a quote only (superseded) |

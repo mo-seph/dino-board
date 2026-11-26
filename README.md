@@ -26,7 +26,7 @@ decision and its reason, the parts list with stock checks, the review findings, 
 | `tools/silkscreen.py` | Draws the show face's silkscreen: the mosasaurus, touch pad outlines, LED numbers, the name |
 | `tools/title_outline.py`, `art/lettering.json` | The lettering as plain outlines, made once from a font file |
 | `software/` | The programs the board runs: the `dino` library, the host program, eight behaviours, tests, and the documents for people and for AI models writing behaviours. Start at `software/README.md` |
-| `web/` | The website: a landing page, a simulator that runs the board's own Python in a browser, and a page for writing a behaviour with an AI |
+| `web/` | The website, live at https://mo-seph.github.io/dino-board/ (GitHub Pages, served from this repository's top folder): a landing page, a simulator that runs the board's own Python in a browser, and a page for writing a behaviour with an AI |
 | `tools/sim_shape.py` | The board's outline, LED positions and touch-pad shapes for the simulator, read from the board file |
 | `tools/freerouting_capped.sh` | Runs the Freerouting autorouter for a set number of passes |
 | `routing/route_signals.ses` | The autorouter's last result, kept because it differs run to run |
